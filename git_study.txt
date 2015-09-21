@@ -46,9 +46,15 @@ git init
 时光机穿梭
 1.随时查看工作区状态
 git status
-2.查看修改内容的不同之处
-git diff  <filename>
+2.查看修改内容的不同之处[比较还没有add的文件与已经add过的文件的区别]
+git diff  <filename>    
+3.添加文件并提交
+git add  <filename>
+git commit -m "提交版本描述"
 
+备注：
+通过git --help command可以查看命令使用方法
+例如:git --help commit
 
 
 
