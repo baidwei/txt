@@ -203,3 +203,9 @@ git log --graph --pretty=oneline --abbrev-commit
 Git分支十分强大，在团队开发中应该充分应用。
 合并分支时，加上--no-ff参数就可以用普通模式合并，合并后的历史有分支，能看出来曾经做过合并，而fast forward合并就看不出来曾经做过合并。
 
+当有紧急工作时，有不想commit现在做一半的工作，就可以使用git stash ,然后切换到其他分支进行紧急工作。
+通过git stash 命令，保存当前工作现场
+通过git stash list 命令，查看stash队列
+通过git stash pop stash@{num} ,num就是你要恢复的工作现场的编号。
+通过git stash clear 命令,清空stash队列
+
