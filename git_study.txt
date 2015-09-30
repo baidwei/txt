@@ -170,7 +170,11 @@ git checkout master
 3.合并分支
 git merge feature1
 Git用<<<<<<<，=======，>>>>>>>标记出不同分支的内容
+<<<<<<< HEAD
 4.用带参数的git log也可以看到分支的合并情况：
+=======
+4.用带参数的git log也可以看到分支的合并情况： 
+>>>>>>> dev
 git log --graph --pretty=oneline --abbrev-commit
 5.删除分支
 git branch -d feature1
@@ -190,7 +194,12 @@ git commit -m "add merge"
 3.切换到master分支
 git checkout master
 4.合并dev分支[使用--no-ff方式的git merge]   其中-m参数，将commit描述写进去去。
+<<<<<<< HEAD
 git merge --no-ff -m "merge with no-ff" dev
+=======
+git merge --no-ff -m "merge with no-ff" dev       ---使用--no-ff参数后，会执行正常合并，在Master分支上生成一个新节点
+默认没有--no-ff参数情况下，Git执行"快进式合并"（fast-farward merge），会直接将Master分支指向Develop分支
+>>>>>>> dev
 5.合并后，用git log查看分支历史
 git log --graph --pretty=oneline --abbrev-commit
 
@@ -203,6 +212,7 @@ git log --graph --pretty=oneline --abbrev-commit
 Git分支十分强大，在团队开发中应该充分应用。
 合并分支时，加上--no-ff参数就可以用普通模式合并，合并后的历史有分支，能看出来曾经做过合并，而fast forward合并就看不出来曾经做过合并。
 
+<<<<<<< HEAD
 当有紧急工作时，有不想commit现在做一半的工作，就可以使用git stash ,然后切换到其他分支进行紧急工作。
 通过git stash 命令，保存当前工作现场
 通过git stash list 命令，查看stash队列
@@ -210,3 +220,119 @@ Git分支十分强大，在团队开发中应该充分应用。
 通过git stash clear 命令,清空stash队列
 
 添加验证bug修复信息内容
+=======
+BUG分支
+软件开发中，bug就像家常便饭一样。有了bug就需要修复，在Git中，由于分支是如此的强大，
+所以，每个bug都可以通过一个新的临时分支来修复，修复后，合并分支，然后将临时分支删除。
+
+通过git stash 命令，保存当前工作现场
+通过git stash list 命令，查看stash队列
+通过list查看后，使用git stash pop stash@{num}。num 就是你要恢复的工作现场的编号
+通过git stash clear命令，清空stash队列
+
+1.查看当前状态
+F:\git_repository\txt>git status
+On branch dev
+Changes not staged for commit:
+  (use "git add <file>..." to update what will be committed)
+  (use "git checkout -- <file>..." to discard changes in working directory)
+
+        modified:   git_study.txt
+
+no changes added to commit (use "git add" and/or "git commit -a")
+F:\git_repository\txt>
+
+2.记录当前现场
+F:\git_repository\txt>git stash
+Saved working directory and index state WIP on dev: 6096210 add bug content
+HEAD is now at 6096210 add bug content
+
+F:\git_repository\txt>
+
+3.此时查看当前状态，即为Clean状态
+F:\git_repository\txt>git status
+On branch dev
+nothing to commit, working directory clean
+
+F:\git_repository\txt>
+4.确定在哪个分支上出现BUG，然后创建分支修复BUG
+比如master分支上出现BUG需要修复。首先切换到master分支，然后从master分支，创建分支修复BUG
+F:\git_repository\txt>git checkout master
+Switched to branch 'master'
+Your branch is up-to-date with 'origin/master'.
+
+F:\git_repository\txt>git checkout -b issue-101
+Switched to a new branch 'issue-101'
+
+F:\git_repository\txt>
+5.修复文件，然后添加并提交
+F:\git_repository\txt>git add git_study.txt
+
+F:\git_repository\txt>git commit -m "fix bug 101"
+[issue-101 cae6efe] fix bug 101
+ 1 file changed, 1 insertion(+)
+
+F:\git_repository\txt>
+5.提交完成后，切换回master分支，做合并，最后删除issue-101分支
+F:\git_repository\txt>git checkout master
+Switched to branch 'master'
+Your branch is up-to-date with 'origin/master'.
+
+F:\git_repository\txt>git merge --no-ff -m "merged bug fix 101" issue-101
+Merge made by the 'recursive' strategy.
+ git_study.txt | 1 +
+ 1 file changed, 1 insertion(+)
+
+F:\git_repository\txt>git branch -d issue-101
+Deleted branch issue-101 (was cae6efe).
+
+F:\git_repository\txt>
+6.完成bug修复，后续可以切换到原来的dev现场继续干活
+F:\git_repository\txt>git checkout dev
+Switched to branch 'dev'
+
+F:\git_repository\txt>git status
+On branch dev
+nothing to commit, working directory clean
+
+F:\git_repository\txt>
+7.工作区干净的，然后通过git stash list查看之前保存的工作现场
+F:\git_repository\txt>git stash list
+WARNING: terminal is not fully functional
+stash@{0}: WIP on dev: 6096210 add bug content
+
+F:\git_repository\txt>
+8.恢复工作现场
+一般用git stash apply恢复现场，此恢复操作，stash内容并不删除，若需要删除，通过git stash drop删除；
+另一种方式是用git stash pop,恢复现场的同时将stash内容也删除了
+注意：也可以做多次stash，恢复的时候，先用git stash list查看，然后恢复指定stash,用命令:git stash apply stash@{0} 
+F:\git_repository\txt>git stash apply
+On branch dev
+Changes not staged for commit:
+  (use "git add <file>..." to update what will be committed)
+  (use "git checkout -- <file>..." to discard changes in working directory)
+
+        modified:   git_study.txt
+
+no changes added to commit (use "git add" and/or "git commit -a")
+
+F:\git_repository\txt>git stash list
+WARNING: terminal is not fully functional
+stash@{0}: WIP on dev: 6096210 add bug content
+
+F:\git_repository\txt>
+F:\git_repository\txt>git stash drop
+Dropped refs/stash@{0} (d9baa3e5a6339965588ce7f92afb4e2d454289d8)
+
+F:\git_repository\txt>git stash list
+
+F:\git_repository\txt>
+
+总结：
+修复bug时，我们会通过创建新的bug分支进行修复，然后合并，最后删除；
+当手头工作没有完成时，先把工作现场git stash一下，然后去修复bug，修复后，再git stash pop，回到工作现场。
+
+Feature分支
+软件开发中，总有无穷无尽的新的功能要不断添加进来。
+添加一个新功能时，你肯定不希望因为一些实验性质的代码，把主分支搞乱了，所以，每添加一个新功能，最好新建一个feature分支，在上面开发，完成后，合并，最后，删除该feature分支。
+>>>>>>> dev
