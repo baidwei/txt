@@ -209,3 +209,4 @@ Git分支十分强大，在团队开发中应该充分应用。
 通过git stash pop stash@{num} ,num就是你要恢复的工作现场的编号。
 通过git stash clear 命令,清空stash队列
 
+添加验证bug修复信息内容
