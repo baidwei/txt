@@ -1,0 +1,103 @@
+Docker安装手册
+1.安装方式
+Docker支持多种安装选择，推荐在ubuntu下安装(docker是再ubuntu下开发的，安装包测试比较充分，保证软件包的可用性)。
+其他的比如Windows,MAC及其他linux发行版本无法原生运行docker,可以使用虚拟软件创建一个ubuntu的虚拟机并在里面运行docker。
+
+2.Linux下安装docker
+2.1.ubuntu下安装
+由于LXC的一个bug,docker在3.8内核下面运行最佳。
+Ubuntu的Precise版本内置的是3.2版本的内核，因此我们首先需要升级内核。安装下面的步骤可以升级到3.8内核，并内置AUFS的支持。同时还包括了通用头文件，这样我们就可以激活依赖于这些头文件的包，比如ZFS，VirtualBox的增强功能包。
+安装docker:
+Docker有deb格式的安装包，安装起来非常的容易。首先添加Docker库的密钥。
+sudo apt-key adv --keyserver keyserver.ubuntu.com --recv-keys 36A1D7869245C8950F966E92D8576A8BA88D21E9
+然后把Docker的库添加到apt的源列表中，更新并安装lxc-docker包
+sudo sh -c "echo deb http://get.docker.io/ubuntu docker main\
+> /etc/apt/sources.list.d/docker.list"
+sudo apt-get update
+sudo apt-get install lxc-docker
+安装过程中会有一个警告信息，输入"yes"继续安装即可。安装成功之后，可以下载ubuntu镜像并启动一个镜像来验证安装是否正常。
+sudo docker run -i -t ubuntu /bin/bash
+成功运行之后，输入exit退出即可。
+
+2.2.RHEL下安装
+Docker目前可以在红帽企业版7(Red Hat Enterprise Linux 7)版本下面安装
+Docker需要一个64位系统的红帽系统，内核的版本必须大于3.10。
+目前红帽RHEL系统下面安装docker可以有两种方式：一种是使用curl获得docker的安装脚本进行安装，还有一种是使用yum包管理器来安装docker。
+
+2.2.1.使用安装脚本安装。
+备注：你可以按照同样的步骤在CentOS系统下面安装docker。
+使用一个有sudo权限的帐号登录红帽系统。
+更新现有的yum包。
+$ sudo yum update 
+执行docker安装脚本。
+$ curl -sSL https://get.docker.com/ | sh 
+启动docker服务。
+$ sudo service docker start
+2.2.2.使用yum包安装
+使用有sudo权限的帐号登录系统。
+更新yum包。
+$ sudo yum update 
+添加docker源。
+$ cat >/etc/yum.repos.d/docker.repo <<-EOF
+[dockerrepo]
+name=Docker Repository
+baseurl=https://yum.dockerproject.org/repo/main/centos/7 enabled=1 gpgcheck=1 gpgkey=https://yum.dockerproject.org/gpg EOF
+使用yum命令安装docker。
+$ sudo yum install docker-engine 
+启动docker服务。
+$ sudo service docker start
+确认docker是否安装成功。
+$ sudo docker run hello-world
+
+为什么需要创建docker用户组？
+
+Docker守候进程绑定的是一个unix socket，而不是TCP端口。这个套接字默认的属主是root，其他是用户可以使用sudo命令来访问这个套接字文件。因为这个原因，docker服务进程都是以root帐号的身份运行的。
+
+为了避免每次运行docker命令的时候都需要输入sudo，可以创建一个docker用户组，并把相应的用户添加到这个分组里面。当docker进程启动的时候，会设置该套接字可以被docker这个分组的用户读写。这样只要是在docker这个组里面的用户就可以直接执行docker命令了。
+
+警告：该dockergroup等同于root帐号，具体的详情可以参考这篇文章：Docker Daemon Attack Surface.
+操作步骤：
+使用有sudo权限的帐号登录系统。
+创建docker分组，并将相应的用户添加到这个分组里面。
+sudo usermod -aG docker your_username
+退出，然后重新登录，以便让权限生效。
+确认你可以直接运行docker命令。
+$ docker run hello-world
+
+使用下面的命令可以设置红帽系统或者centos系统启动的时候，自动启动docker服务。
+$ sudo chkconfig docker on 
+如果你需要为docker设置http代理、使用不同的目录或者分区，或者做其他的个性化设置
+
+
+
+可以使用yum来删除docker。
+列出docker包的具体的名字。
+$ yum list installed | grep docker
+yum list installed | grep docker
+docker-engine.x86_64 1.7.1-0.1.el7
+删除docker。
+$ sudo yum -y remove docker-engine.x86_64 
+备注：该命令只是删除docker运行环境，并不会删除镜像，容器，卷文件，以及用户创建的配置文件。
+清除镜像和容器文件。
+$ rm -rf /var/lib/docker
+手工查找并删除用户创建的配置文件。
+
+2.3.Debian下安装
+参考官网指导或者：http://www.docker.org.cn/book/install/34_install-docker-on-debian-8.0-jessie.html
+3.Windows下安装docker
+Docker Toolbox 介绍
+Docker官方已经不再推荐Boot2Docker，而是使用Docker Machine来代替
+可以使用Docker Toolbox工具箱来安装docker machine工具和其他的Docker工具。
+Docker ToolBox共包含5个docker工具：
+    Docker Machine：包含了docker-machine命令。
+    运行Docker命令所需要的引擎。
+    Kitematic，Docker GUI界面。
+    事先为docker 命令行环境配置好的shell。
+    Oracle公司的VM VirtualBox包。
+因为Docker守候进程依赖于linux内核，所以无法直接在windows环境中直接运行Docker。解决方案就是使用docker-machine命令创建一个Docker虚拟机并附加到它上面。这个Docker虚拟机来为你的windows系统提供Docker服务。
+这个Docker虚拟机专门为windows运行环境优化过，轻量级，完全在内存中运行，很小，下载不超过24M，5秒那可以启动
+
+Docker Toolbox只能在windows 7.1, windows8, 8.1或者更高版本上面安装运行。Windows 10暂时还不支持。
+确认windows版本
+到控制面板里面打开“系统和安全”，查看系统信息。如果版本低的话，需要升级。
+4.Mac OS X下面安装docker

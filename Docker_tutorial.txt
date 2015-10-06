@@ -1,0 +1,64 @@
+Docker知识学习笔记
+1.什么是Docker？
+Docker是一个开源的引擎，可以轻松为任何应用提供一个轻量级的、可移植的、自给自足的容器。
+开发者在电脑上编译测试通过的容器，可以批量地的在生成环境中部署，包括：VMs(虚拟机)、bare metal、OpenStack集群和其他的基础应用平台。
+
+2.Docker通常应用的场景：
+web应用的自动化打包和发布；
+自动化测试和持续集成、发布；
+在服务器环境中部署和调整数据库 或者其他的后台应用；
+从头编译或者扩展现有的OpenShift或者Cloud Foundry平台来搭建自己的PaaS环境。
+
+3.入门教程学习---准备
+Docker系统有两个程序：docker服务端和docker客户端.
+docker服务端是一个服务进程，管理着所有的容器。
+docker客户端则扮演着docker服务器端的远程控制，可以用来控制docker的服务端进程。
+大部分情况，docker服务端和客户端在同一台机器上。
+查看docker版本命令:docker version
+
+4.入门教程学习---搜索可用docker镜像
+目的：学会用docker search 命令来检索可用镜像
+比如检索tutorial工具：docker search tutorial
+
+5.入门教程学习---下载容器镜像
+目的:学会用docker pull命令下载镜像（docker网站上的镜像都是按照 用户名/镜像名 方式存储的）
+比如下载tutorial工具:docker pull learn/tutorial
+
+5.入门教程学习---通过docker启动并运行一个命令
+在docker容器中运行hello world!
+docker容器可以理解为沙盒中运行的进程。
+在这个沙盒中包含了进程运行所必须的资源，包括：文件系统、系统类库、shell环境等等。
+默认情况下，沙盒不会运行任何程序。
+如果你需要在沙盒中运行一个进程来启动某一个容器。
+这个进程是该容器的唯一进程，当该进程结束的时候，容器也完全的停止。
+参考命令：docker run命令有两个镜像，一个是镜像名，一个是要在镜像中运行的命令。
+例如：docker run learn/tutorial echo "hello world"
+
+6.入门教程学习---在容器中安装新的程序
+之前下载的learn/tutorial镜像是基于ubuntu的。
+所以可以用ubuntu的apt-get 命令来安装ping程序:apt-get install -y ping  需要指定参数-y,不指定-y会进入交互模式，需要用户输入命令来进行确认。 
+备注：apt-get 命令执行完毕后，容器就会停止，但容器的改动不会丢失。
+参考命令:docker run learn/tutorial apt-get install -y ping
+
+7.入门教程学习---如何保存对镜像修改
+当你对某个容器做了修改之后（通过在容器中运行某个命令），可以把容器的修改保存下来。
+docker中保存状态的过程称之为committing,它保存的新旧状态之间的区别，从而产生一个新的版本。
+查看容器的ID：docker ps -l
+运行docker commit ,可以查看该命令的参数列表。
+然后使用如下命令保存对容器修改：docker commit ID(上面命令查到的ID) learn/ping
+执行完docker commit命令之后，会返回新版本镜像的ID号。
+
+8.入门教程学习---如何运行新镜像
+参考名:docker run learn/ping ping www.baidu.com
+
+9.入门教程学习---检查运行中的镜像
+使用docker ps 命令可以查看正在运行中的容器列表，使用docker inspect命令，可以查看更详细的关于某一个容器的信息。
+查看所有正在运行中的容器列表：docker ps 
+查看更详细的关于某一个容器的信息：docker inspect ID
+
+10.入门教程学习---发布自己的镜像
+比如把learn/ping发布到docker的index网站
+列出所有安装过的镜像:docker images
+将某一个镜像发布到官方网站:docker push
+docker push learn/ping
+
