@@ -1,7 +1,9 @@
+﻿测试。。。。。。。。。。
 Docker安装手册
 1.安装方式
 Docker支持多种安装选择，推荐在ubuntu下安装(docker是再ubuntu下开发的，安装包测试比较充分，保证软件包的可用性)。
 其他的比如Windows,MAC及其他linux发行版本无法原生运行docker,可以使用虚拟软件创建一个ubuntu的虚拟机并在里面运行docker。
+
 
 2.Linux下安装docker
 2.1.ubuntu下安装
